@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons.PersistentCache", "src\Commons.PersistentCache\Commons.PersistentCache.csproj", "{9F1A7508-9F30-4C0D-B001-42472DCD4E58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons.PersistentCache.SQLite", "src\Commons.PersistentCache.SQLite\Commons.PersistentCache.SQLite.csproj", "{3E32FC08-D05E-4050-AECA-D912590BBA5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons.PersistentCache.SQLite.Tests", "tests\Commons.PersistentCache.SQLite.Tests\Commons.PersistentCache.SQLite.Tests.csproj", "{DFA7CFF0-B5DB-4C1B-BFFB-7B8C0371FFD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F1A7508-9F30-4C0D-B001-42472DCD4E58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F1A7508-9F30-4C0D-B001-42472DCD4E58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F1A7508-9F30-4C0D-B001-42472DCD4E58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F1A7508-9F30-4C0D-B001-42472DCD4E58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E32FC08-D05E-4050-AECA-D912590BBA5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E32FC08-D05E-4050-AECA-D912590BBA5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E32FC08-D05E-4050-AECA-D912590BBA5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E32FC08-D05E-4050-AECA-D912590BBA5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFA7CFF0-B5DB-4C1B-BFFB-7B8C0371FFD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFA7CFF0-B5DB-4C1B-BFFB-7B8C0371FFD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFA7CFF0-B5DB-4C1B-BFFB-7B8C0371FFD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFA7CFF0-B5DB-4C1B-BFFB-7B8C0371FFD3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
