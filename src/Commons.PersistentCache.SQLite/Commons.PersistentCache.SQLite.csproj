@@ -13,8 +13,12 @@
         </AssemblyAttribute>
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(UseDevelopmentReferences)' == 'true'">
       <ProjectReference Include="..\Commons.PersistentCache\Commons.PersistentCache.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(UseDevelopmentReferences)' != 'true'">
+        <PackageReference Include="Commons.PersistentCache" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>
