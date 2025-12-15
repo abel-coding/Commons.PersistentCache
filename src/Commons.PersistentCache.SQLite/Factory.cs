@@ -1,15 +1,20 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Commons.PersistentCache.SQLite.Tests;
+namespace Commons.PersistentCache.SQLite;
 
+/// <summary>
+/// Custom <see cref="IPersistentCacheFactory"/> that will build <see cref="Cache"/> instances.
+/// </summary>
 public class Factory : IPersistentCacheFactory
 {
     private static ConcurrentDictionary<string, Cache> Cache { get; } = new();
     
     #region IPersistentCacheFactory
 
+    /// <inheritdoc />
     public string? DefaultPath { get; set; }
 
+    /// <inheritdoc />
     public IPersistentCache Create(string path, PersistentCacheConfiguration? configuration = null)
     {
         lock (Cache)

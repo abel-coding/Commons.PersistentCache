@@ -2,8 +2,16 @@ using Microsoft.Data.Sqlite;
 
 namespace Commons.PersistentCache.SQLite;
 
+/// <summary>
+/// Fast <see cref="IPersistentCache"/> implementation on top of SQLite.
+/// </summary>
 public partial class Cache : IPersistentCache, IAsyncDisposable
 {
+    /// <summary>
+    /// Default constructor that requires a path for the SQLite database store.
+    /// </summary>
+    /// <param name="path">Base path to be used for the SQLite database.</param>
+    /// <param name="configuration">Cache configuration if needed.</param>
     public Cache(string path, PersistentCacheConfiguration? configuration = null)
     {
         _configuration = configuration;
@@ -37,6 +45,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
 
     #region IPersistentCache
 
+    /// <inheritdoc />
     public async Task<bool> SetConfigurationAsync(PersistentCacheConfiguration configuration,
         CancellationToken cancellationToken = default)
     {
@@ -49,6 +58,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<bool> CleanupAsync(CancellationToken cancellationToken = default)
     {
         await InitializationTask.ConfigureAwait(false);
@@ -60,6 +70,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<byte[]?> GetAsync(string key, CancellationToken cancellationToken = default)
     {
         await InitializationTask.ConfigureAwait(false);
@@ -74,6 +85,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<bool> SaveAsync(string key, byte[] data, CancellationToken cancellationToken = default)
     {
         await InitializationTask.ConfigureAwait(false);
@@ -84,6 +96,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<bool> SaveAsync(string key, byte[] data, EntryConfiguration configuration,
         CancellationToken cancellationToken = default)
     {
@@ -95,6 +108,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<bool> RemoveAsync(string key, CancellationToken cancellationToken = default)
     {
         await InitializationTask.ConfigureAwait(false);
@@ -638,6 +652,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
 
     internal bool IsDisposed => _disposed;
 
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         if (_disposed) return;

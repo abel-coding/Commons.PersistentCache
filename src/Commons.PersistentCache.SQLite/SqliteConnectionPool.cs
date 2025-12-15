@@ -4,14 +4,14 @@ using Microsoft.Data.Sqlite;
 
 namespace Commons.PersistentCache.SQLite;
 
-public class SqliteConnectionPool : IAsyncDisposable
+internal class SqliteConnectionPool : IAsyncDisposable
 {
     private readonly string _connectionString;
     private readonly ConcurrentBag<SqliteConnection> _pool = new();
     private readonly SemaphoreSlim _poolLimiter;
     private bool _disposed = false;
 
-    public SqliteConnectionPool(string connectionString, int maxPoolSize = 3)
+    internal SqliteConnectionPool(string connectionString, int maxPoolSize = 3)
     {
         _connectionString = connectionString;
         _poolLimiter = new SemaphoreSlim(maxPoolSize, maxPoolSize);
