@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Abel Sanchez</Authors>
+    <PackageProjectUrl>https://github.com/abel-coding/Commons.PersistentCache</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/abel-coding/Commons.PersistentCache</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>

@@ -7,16 +7,10 @@
 
         <!-- Package Information -->
         <PackageId>Commons.PersistentCache</PackageId>
-        <Version>1.0.0</Version>
         <Title>Commons.PersistentCache Definitions</Title>
-        <Authors>Abel Sanchez</Authors>
         <Description>Abstract definitions for a persistent cache mechanism in .NET</Description>
-        <PackageProjectUrl>https://github.com/abel-coding/Commons.PersistentCache</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/abel-coding/Commons.PersistentCache</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
         <PackageTags>cache;persistent;storage</PackageTags>
-        <PackageReleaseNotes>Initial release</PackageReleaseNotes>
 
         <!-- Documentation -->
         <GenerateDocumentationFile>true</GenerateDocumentationFile>

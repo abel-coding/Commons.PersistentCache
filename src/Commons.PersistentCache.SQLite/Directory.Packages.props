@@ -1,5 +1,5 @@
 <Project>
   <PropertyGroup>
-    <UseDevelopmentReferences>false</UseDevelopmentReferences>
+    <DirectProjectReference>true</DirectProjectReference>
   </PropertyGroup>
 </Project>

@@ -8,16 +8,10 @@
 
         <!-- Package Information -->
         <PackageId>Commons.PersistentCache.SQLite</PackageId>
-        <Version>1.0.0</Version>
         <Title>Commons.PersistentCache implementation using SQLite</Title>
-        <Authors>Abel Sanchez</Authors>
-        <Description>Persistent cachen implementation on top of SQLite</Description>
-        <PackageProjectUrl>https://github.com/abel-coding/Commons.PersistentCache</PackageProjectUrl>
+        <Description>Persistent cache implementation on top of SQLite</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/abel-coding/Commons.PersistentCache</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
         <PackageTags>cache;persistent;storage;sqlite</PackageTags>
-        <PackageReleaseNotes>Initial release</PackageReleaseNotes>
 
         <!-- Documentation -->
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -33,12 +27,12 @@
         </AssemblyAttribute>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(UseDevelopmentReferences)' == 'true'">
+    <ItemGroup Condition="'$(DirectProjectReference)' == 'true'">
       <ProjectReference Include="..\Commons.PersistentCache\Commons.PersistentCache.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(UseDevelopmentReferences)' != 'true'">
-        <PackageReference Include="Commons.PersistentCache" Version="1.0.0" />
+    <ItemGroup Condition="'$(DirectProjectReference)' != 'true'">
+        <PackageReference Include="Commons.PersistentCache" Version="*" />
     </ItemGroup>
 
     <ItemGroup>
