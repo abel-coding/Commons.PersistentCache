@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 
 namespace Commons.PersistentCache.SQLite;
 
@@ -12,8 +13,10 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
     /// </summary>
     /// <param name="path">Base path to be used for the SQLite database.</param>
     /// <param name="configuration">Cache configuration if needed.</param>
-    public Cache(string path, PersistentCacheConfiguration? configuration = null)
+    /// <param name="logger">Logger used to log cache operations</param>
+    public Cache(string path, PersistentCacheConfiguration? configuration = null, ILogger<Cache>? logger = null)
     {
+        _logger = logger;
         _configuration = configuration;
 
         _connectionStringBuilder = new SqliteConnectionStringBuilder
@@ -40,6 +43,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
     private bool _disposed;
     private bool _internalCleanUpInProgress;
     private readonly object _internalCleanuplockObject = new();
+    private readonly ILogger<Cache>? _logger = null;
 
     #endregion
 
@@ -118,7 +122,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
             return await RemoveEntryAsync(connection, key, cancellationToken);
         }, cancellationToken);
     }
-    
+
     #endregion
 
     #region Private
@@ -158,7 +162,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger?.LogError(e, "Failed to initialize cache database.");
                 return false;
             }
             finally
@@ -186,7 +190,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to rent connection from pool.");
         }
 
         T? result;
@@ -196,7 +200,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to execute function with connection.");
             throw;
         }
         finally
@@ -209,7 +213,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
 
         return result;
     }
-    
+
     private async Task<bool> ConfigurePragmaAsync(SqliteConnection connection,
         CancellationToken cancellationToken = default)
     {
@@ -266,7 +270,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to update cache metadata configuration.");
             return false;
         }
     }
@@ -333,7 +337,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
             var utcNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             await using var command = connection.CreateCommand();
-            
+
             bool hasConfiguration = configuration != null;
 
             if (hasConfiguration)
@@ -394,13 +398,13 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }
         catch (SqliteException e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to upsert entry. Rolling back transaction.");
             await transaction.RollbackAsync(cancellationToken);
             return false;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to upsert entry.");
             return false;
         }
     }
@@ -445,7 +449,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to retrieve entry.");
             return null;
         }
     }
@@ -481,7 +485,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to remove entry.");
             return false;
         }
     }
@@ -574,7 +578,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }
         catch (SqliteException e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed while cleaning up. Rolling back transaction.");
             await transaction.RollbackAsync(cancellationToken);
             return false;
         }
@@ -584,7 +588,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed while cleaning up.");
             return false;
         }
     }

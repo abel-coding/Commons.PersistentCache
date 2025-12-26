@@ -4,7 +4,7 @@ namespace Commons.PersistentCache.SQLite.Tests;
 
 public class TestBase : IAsyncLifetime
 {
-    private ConcurrentBag<Cache> _usedCacheObjects = new ();
+    private readonly ConcurrentBag<Cache> _usedCacheObjects = new ();
 
     protected void RegisterTestCache(Cache cache)
     {
@@ -18,7 +18,7 @@ public class TestBase : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        Console.WriteLine(@"Disposing caches");
+        Console.WriteLine(@"Removing test caches");
         while (_usedCacheObjects.TryTake(out var cache))
         {
             if (cache.IsDisposed) continue;

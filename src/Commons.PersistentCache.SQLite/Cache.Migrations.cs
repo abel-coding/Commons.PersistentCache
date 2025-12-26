@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
 
 namespace Commons.PersistentCache.SQLite;
 
@@ -69,13 +70,13 @@ public partial class Cache
         }
         catch (SqliteException e)
         {
-            Console.WriteLine(e);
+            await transaction.RollbackAsync();
+            _logger?.LogError(e, "Failed to create database structure. Rolled back transaction.");
             throw;
         }
         catch (Exception e)
         {
-            await transaction.RollbackAsync();
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to create database structure.");
             throw;
         }
     }
@@ -99,13 +100,13 @@ public partial class Cache
         }
         catch (SqliteException e)
         {
-            Console.WriteLine(e);
+            await transaction.RollbackAsync();
+            _logger?.LogError(e, "Failed to migrate to version 2. Rolled back transaction.");
             throw;
         }
         catch (Exception e)
         {
-            await transaction.RollbackAsync();
-            Console.WriteLine(e);
+            _logger?.LogError(e, "Failed to migrate to version 2.");
             throw;
         }
     }
