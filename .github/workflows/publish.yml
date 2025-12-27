@@ -1,0 +1,46 @@
+name: Publish Unified Release
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Extract Version
+        id: get_version
+        # Removes the 'v' prefix (e.g., v1.0.1 -> 1.0.1) for NuGet compatibility
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Pack All Projects
+        # Forces both packages to share the exact same version number
+        run: dotnet pack --configuration Release --output ./dist /p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+
+      - name: Push Core Package
+        run: |
+          dotnet nuget push "./dist/Commons.PersistentCache.${{ steps.get_version.outputs.VERSION }}.nupkg" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Wait for Indexing
+        # Brief pause to help the registry register the first package
+        run: sleep 20
+
+      - name: Push SQLite Package
+        run: |
+          dotnet nuget push "./dist/Commons.PersistentCache.SQLite.${{ steps.get_version.outputs.VERSION }}.nupkg" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
