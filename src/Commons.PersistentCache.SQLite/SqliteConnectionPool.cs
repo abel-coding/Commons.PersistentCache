@@ -21,10 +21,20 @@ internal class SqliteConnectionPool : IAsyncDisposable
     {
         await _poolLimiter.WaitAsync(cancellationToken);
 
-        if (_pool.TryTake(out var connection))
+        while (_pool.TryTake(out var connection))
         {
             if (connection.State == ConnectionState.Closed)
-                await connection.OpenAsync(cancellationToken);
+            {
+                try
+                {
+                    await connection.OpenAsync(cancellationToken);
+                } 
+                catch
+                {
+                    connection.Dispose();
+                    continue;
+                }
+            }
 
             return connection;
         }

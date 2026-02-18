@@ -85,6 +85,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
             if (stream is null) return null;
             byte[] data = new byte[stream.Length];
             await stream.ReadExactlyAsync(data, 0, data.Length, cancellationToken);
+            await stream.DisposeAsync();
             return data;
         }, cancellationToken);
     }
@@ -375,11 +376,13 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
 
             if (hasConfiguration)
             {
-                command.Parameters.AddWithValue("$TimeToLiveInSeconds", configuration?.TimeToLiveInSeconds ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("SlidingTimeToLiveInSeconds", configuration?.SlidingTimeToLiveInSeconds ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$TimeToLiveInSeconds",
+                    configuration?.TimeToLiveInSeconds ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("$SlidingTimeToLiveInSeconds",
+                    configuration?.SlidingTimeToLiveInSeconds ?? (object)DBNull.Value);
             }
 
-            var reader = await command.ExecuteReaderAsync(cancellationToken);
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
 
             long previousSize = 0;
@@ -427,8 +430,13 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
             command.Parameters.AddWithValue("$Key", key);
             command.Parameters.AddWithValue("$AccessUtc", utcNow);
 
+            // Don't dispose since we are returning its Stream
             var reader = await command.ExecuteReaderAsync(cancellationToken);
-            if (!await reader.ReadAsync(cancellationToken)) return null;
+            if (!await reader.ReadAsync(cancellationToken))
+            {
+                _ = reader.DisposeAsync();
+                return null;
+            }
 
             var accessUtc = reader.GetInt64(1);
             var createdUtc = reader.GetInt64(2);
@@ -436,6 +444,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
             long? slidingTimeToLiveInSeconds = reader.IsDBNull(4) ? null : reader.GetInt64(4);
             if (!IsValid(accessUtc, createdUtc, timeToLiveInSeconds, slidingTimeToLiveInSeconds))
             {
+                _ = reader.DisposeAsync();
                 await RemoveEntryAsync(connection, key, cancellationToken);
                 return null;
             }
@@ -469,11 +478,10 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
 
             command.Parameters.AddWithValue("$Key", key);
 
-            var reader = await command.ExecuteReaderAsync(cancellationToken);
-            await reader.ReadAsync(cancellationToken);
-            if (reader.HasRows)
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            if (await reader.ReadAsync(cancellationToken))
             {
-                var sizeInBytes = reader.GetInt64(0);
+                var sizeInBytes = reader.IsDBNull(0) ? 0 : reader.GetInt64(0);
                 Interlocked.Add(ref _totalSizeInBytes, -sizeInBytes);
             }
 
@@ -528,7 +536,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
                 command.Parameters.AddWithValue("$SlidingTimeToLiveInSeconds", slidingTimeToLiveInSeconds);
                 command.Parameters.AddWithValue("$TimeToLiveInSeconds", timeToLiveInSeconds);
 
-                var reader = await command.ExecuteReaderAsync(cancellationToken);
+                await using var reader = await command.ExecuteReaderAsync(cancellationToken);
                 if (await reader.ReadAsync(cancellationToken))
                 {
                     var sizeInBytes = reader.IsDBNull(0) ? 0 : reader.GetInt64(0);
@@ -563,7 +571,7 @@ public partial class Cache : IPersistentCache, IAsyncDisposable
                                       DELETE FROM Entries WHERE ROWID IN (SELECT ROWID FROM ToDelete);
                                       """;
                 command.Parameters.AddWithValue("$Limit", remainingEntries / 2);
-                var reader = await command.ExecuteReaderAsync(cancellationToken);
+                await using var reader = await command.ExecuteReaderAsync(cancellationToken);
                 if (await reader.ReadAsync(cancellationToken))
                 {
                     var sizeInBytes = reader.IsDBNull(0) ? 0 : reader.GetInt64(0);
