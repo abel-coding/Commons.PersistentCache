@@ -25,7 +25,11 @@ jobs:
 
       - name: Pack All Projects
         # Forces both packages to share the exact same version number
-        run: dotnet pack --configuration Release --output ./dist /p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+        run: |
+          for proj in src/*/*.csproj; do
+            echo "Running command on $proj"
+            dotnet pack "$proj" --configuration Release --output ./dist /p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+          done
 
       - name: Push Core Package
         run: |
